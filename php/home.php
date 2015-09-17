@@ -13,7 +13,7 @@ session_start();
     //function lectura_listas(){
         echo "</br>";
         echo "funcion lectura de listas";
-        $sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'";
+        $sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=false";
         
         foreach ($conn->query($sql) as $row) {
             $id_lista=$row["id_lista"];
