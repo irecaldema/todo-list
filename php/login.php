@@ -13,7 +13,7 @@ session_start();
             //$sql="SELECT nombre FROM usuarios WHERE usuario='$usuario' and pass='$pass";
             //$sql="SELECT nombre FROM usuarios WHERE usuario='nohtrim' and pass=1234";
             //$sql="SELECT nombre FROM usuarios WHERE usuario='".$usuario."'and pass="".md5($pass)";
-            $sql="SELECT nombre FROM usuarios WHERE usuario='".$usuario."'and pass='".md5($pass)."'";
+            $sql="SELECT nombre, id_usuario FROM usuarios WHERE usuario='".$usuario."'and pass='".md5($pass)."'";
             
             //$stmt = $db->query('SELECT * FROM table');
             /*foreach ($conn->query($sql) as $row) {
@@ -21,6 +21,7 @@ session_start();
             }*/ 
             foreach ($conn->query($sql) as $row) {
                 $nombre=$row["nombre"];
+                $id_usuario=$row["id_usuario"];
             }
             
             /*$sth = $conn->prepare($sql);
@@ -37,6 +38,7 @@ session_start();
            if ($nombre!=null){
                 $_SESSION['usuario']=$usuario;
                 $_SESSION['nombre']=$nombre;
+                $_SESSION['id_usuario']=$id_usuario;
                 header("location:home.php");
             }
         }
@@ -79,7 +81,8 @@ session_start();
     						</p>
     					</form>
     				</div>
-    				<div id="pie" class="tac">Sistema de Gesti&oacute;n de Contenidos
+    				<div id="pie" class="tac">
+    				    <!-- PIE DE LA VENTANA REGISTRO-->
     				</div>
     			</div>
     		</div>
