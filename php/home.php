@@ -8,6 +8,8 @@ session_start();
     }
     echo "usuario ".$_SESSION['usuario'];
     echo " nombre ".$_SESSION['nombre'];
+    
+    
    
 ?>
 <!DOCTYPE html>

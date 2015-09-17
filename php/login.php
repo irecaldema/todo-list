@@ -1,19 +1,7 @@
 <?php
-include("conexionPDO.php");
+include "conexionPDO.php";
 session_start();
-//$conn = conexionPDO();
-    //$conn=0;
-    try {
-	    $conn = new PDO('mysql:host=localhost;dbname=TODO_BD', $usuario, $password);
-	    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	    //echo "Connection ok";
-	    $comprobacion_conexion=true;
-    }
-    catch(PDOException $e){
-        echo "Connection failed: " . $e->getMessage();
-        
-        $comprobacion_conexion=false;
-    }
+
     if ($comprobacion_conexion){
         //busqueda en la base de datos del usuario
         //comprobacion de contraseña
@@ -24,7 +12,8 @@ session_start();
             $pass=$_POST["pass"];  //echo "pass ".$_POST["pass"];
             //$sql="SELECT nombre FROM usuarios WHERE usuario='$usuario' and pass='$pass";
             //$sql="SELECT nombre FROM usuarios WHERE usuario='nohtrim' and pass=1234";
-            $sql="SELECT nombre FROM usuarios WHERE usuario='".$usuario."'and pass='".$pass."'";
+            //$sql="SELECT nombre FROM usuarios WHERE usuario='".$usuario."'and pass="".md5($pass)";
+            $sql="SELECT nombre FROM usuarios WHERE usuario='".$usuario."'and pass='".md5($pass)."'";
             
             //$stmt = $db->query('SELECT * FROM table');
             /*foreach ($conn->query($sql) as $row) {
@@ -38,7 +27,7 @@ session_start();
             $sth->execute();
             $array = $sth->fetchAll();
             $nombre=$array[0];
-            print_r($array);*/
+            print($array);*/
             
             //$stmt = $conn->query($sql); 
             //$nombre =$stmt->fetchObject();
@@ -86,7 +75,7 @@ session_start();
     						</p>
     						<p>
     							<input name="submit" type="submit" id="submit" value="Ingresar" class="boton" />
-    							<a href='register.php'> <input name="submit" type="submit" id="submit" value="Registrar" class="boton" /></a>
+    							<a href='registro.php'> <input name="submit" type="submit" id="submit" value="Registrar" class="boton" /></a>
     						</p>
     					</form>
     				</div>
