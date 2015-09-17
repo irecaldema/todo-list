@@ -1,11 +1,13 @@
 <?php
 include("conexionPDO.php");
-$conn = conexionPDO();
+//$conn = conexionPDO();
 session_start();
     if (isset($_SESSION['usuario'])){
     } else {
         header("location:login.php");
     }
+    echo "usuario ".$_SESSION['usuario'];
+    echo " nombre ".$_SESSION['nombre'];
    
 ?>
 <!DOCTYPE html>
