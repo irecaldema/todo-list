@@ -27,7 +27,8 @@ if ($comprobacion_conexion) {
             //echo $affected_rows.' Introducido correctamente';
         }
         else {
-            //echo "Existe usuario" ;
+            echo "Existe usuario" ;
+            //echo "<script type=\"text/javascript\">alert(\"El usuario ya existe\");</script>"; 
         }
     }
 } else {
