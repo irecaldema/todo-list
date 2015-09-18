@@ -2,7 +2,7 @@
     $servername = "localhost";
     $usuariobd = "zubiri";
     $passwordbd = "";
-
+    global $conn;
     //function conexionPDO(){
         try {
     	    $conn = new PDO('mysql:host=localhost;dbname=TODO_BD', $usuariobd, $passwordbd);

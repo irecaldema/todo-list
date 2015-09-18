@@ -13,20 +13,30 @@ session_start();
     //Busqueda de las listas del usuario
     $archivadas=true;
     
-    function lectura_listas($archivadas){
-        echo "</br>";
-        echo "funcion lectura de listas";
-        echo "</br>";
-        //$sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=".$archivados;
-        $sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=true";
+    if(isset($_POST["lectura1"])||isset($_POST["lectura2"])){
+        if(isset($_POST["lectura1"])){ 
+            //echo "le diste al boton no archivadas";
+            $archivadas=0;
+        }
+        if(isset($_POST["lectura2"])){
+            //echo "le diste al boton archivadas";
+            $archivadas=1;
+        }    
+    //function lectura_listas($archivadas){
         
-        /*foreach($conn->query("SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=true") as $row) {
-            echo "entro";
-        }*/
+        echo "</br>";
+        //echo "funcion lectura de listas";
+        echo "</br>";
+        echo "</br>";
+        
+        $sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=".$archivadas;
+        //$sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=true";
+        echo $sql;
+        echo "</br>";
         
         foreach ($conn->query($sql) as $row) {
             $id_lista=$row["id_lista"];
-            
+
         
             //Busqueda de la tarea por id de la tarea
                 $sql="SELECT titulo FROM listas WHERE id_lista='".$id_lista."'";
@@ -44,16 +54,9 @@ session_start();
                     }
                     echo "</br>";
                 }
-        }
-    }
-    
-    if(isset($_POST["lectura1"])){
-        lectura_listas(true);
-    }
-    if(isset($_POST["lectura2"])){
-        lectura_listas(false);
-    } 
-    lectura_listas(true);
+        }//foreach
+    //} function
+      } //if
     
 ?>
 <!DOCTYPE html>
@@ -61,12 +64,14 @@ session_start();
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <script src="jquery/jquery-1.11.3.min.js"></script>
+        <script src="js/controlador.js"></script>
     </head>
     <body>
         <div><p>Bienvenido <?php echo $_SESSION['usuario'] ?> <a href='salir.php'> Cerrar sesión <br> </a></p></div>
-        <form action="home.php">
-            <input type="submit" name="lectura1" value="Lectura de listas" onClick="lectura_listas(false)" />
-            <input type="submit" name="lectura2" value="Listas archivadas" onClick="lectura_listas(true)" />
+        <form action="" method="post">
+            <input type="submit" name="lectura1" value="Lectura de listas" />
+            <input type="submit" name="lectura2" value="Listas archivadas" />
         </form>
         
         	<!--boton crear lista-->
