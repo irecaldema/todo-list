@@ -50,7 +50,7 @@ session_start();
                     foreach ($conn->query($sql) as $row) {
                         $tarea=$row["descripcion"];
                         echo "</br>";
-                        echo $tarea;
+                        echo "<input type='textarea' value='".$tarea."'></input>";
                     }
                     echo "</br>";
                 }
