@@ -1,0 +1,95 @@
+conexionPDO.php
+
+    conexion a la base de datos
+    
+        try {
+    	    $conn = new PDO('mysql:host=localhost;dbname=TODO_BD', $usuariobd, $passwordbd);
+    	    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    	    $comprobacion_conexion=true;
+    	    return $conn;
+        }
+        catch(PDOException $e){
+            echo "Connection failed: " . $e->getMessage();
+            $comprobacion_conexion=false;
+        }
+
+
+
+login.php
+
+    busqueda de usuario
+    
+        $sql="SELECT nombre, id_usuario FROM usuarios WHERE usuario='".$usuario."'and pass='".md5($pass)."'";
+        foreach ($conn->query($sql) as $row) {
+            $nombre=$row["nombre"];
+            $id_usuario=$row["id_usuario"];
+        }
+    
+registro.php
+
+    busqueda de usuario
+    
+        $sql="SELECT id_usuario FROM usuarios WHERE usuario='$usuario'";
+        
+        foreach ($conn->query($sql) as $row) {
+            $id_usuario=$row["id_usuario"];
+        }
+        
+    insercion de usuario
+    
+            $sql = "INSERT INTO usuarios (usuario, pass, nombre) VALUES ('".$usuario."', '".$encrypted_pass."', '".$nombre."')";
+            $conn->exec($sql);
+            
+home.php
+
+    busqueda de listas
+    
+        foreach ($conn->query($sql) as $row) {
+            $id_lista=$row["id_lista"];
+            $archivadas=$row["archivado"];
+            //echo $archivadas;
+            
+            //Busqueda de la tarea por id de la tarea
+                $sql="SELECT titulo FROM listas WHERE id_lista='".$id_lista."'";
+                foreach ($conn->query($sql) as $row) {
+                    $titulo_lista=$row["titulo"];
+                    
+                    if ($archivadas == 1){
+                        //Muestro tambien las listas archivadas
+                        $listasArchivadas = "form_lista_archivadas".$count."";
+                        echo "Cuantas archivadas:   ".$listasArchivadas;
+                        echo "</br>";
+                    }else {
+                        $listasArchivadas = "form_lista".$count."";
+                        echo "Cuantas NO archivadas:  ".$listasArchivadas;
+                        echo "</br>";
+                    }
+                    $tabla = "<td><table border=1>";
+                    $varForm = $tabla."<tr><td><form name='".$listasArchivadas."' method='post' action='home.php'>";
+                    $varForm1 = "</br>";
+                    //echo "titulo ".$titulo_lista;
+                    
+                    $varForm2 = "<input name='titulo_lista' type='text' value='".$titulo_lista."' />";
+        			//echo "<input type='submit' name='modificar' id='submit' value='Modificar titulo'>";
+        			$varForm3  =" <button onclick='alert('You are clicking on me');'>Modificar titulo</button></td></tr>";
+                    
+                    //Busqueda de las tareas de la lista
+                    $sql="SELECT descripcion FROM tareas WHERE id_lista='".$id_lista."'";
+                    foreach ($conn->query($sql) as $row) {
+                        $tarea=$row["descripcion"];
+                        $varForm4 ="</br>";
+                        $varForm5 = "<tr><td><textarea rows='12' cols='40'>$tarea</textarea>";
+                    }
+                    $varForm6 = "</form>";
+                    $varForm7 = "</br></td></tr></table></td>";
+                    
+                    if ($archivadas == 1){
+                         $formTotalArchivadas[$count]= $varForm.$varForm1.$varForm2.$varForm3.$varForm4.$varForm5.$varForm6.$varForm7;
+                         //print_r($formTotalArchivadas[$count]);
+                    }else {
+                         $formTotal[$count]= $varForm.$varForm1.$varForm2.$varForm3.$varForm4.$varForm5.$varForm6.$varForm7;
+                         //var_dump($formTotal[1]);
+                    }
+                    $count++;
+                }
+        }
