@@ -24,21 +24,23 @@ session_start();
             $archivadas=$row["archivado"];
             //echo $archivadas;
             
-            //Busqueda de la tarea por id de la tarea
+            //Busqueda de todos los titulos segun los id listas obtenidos anteriormente
                 $sql="SELECT titulo FROM listas WHERE id_lista='".$id_lista."'";
                 foreach ($conn->query($sql) as $row) {
                     $titulo_lista=$row["titulo"];
                     
                     if ($archivadas == 1){
-                        //Muestro tambien las listas archivadas
+                        //Muestro tambien las listas archivadas y un identificador unico por cada lista
                         $listasArchivadas = "form_lista_archivadas".$count."";
                         /*echo "Cuantas archivadas:   ".$listasArchivadas;
                         echo "<br/>";*/
                     }else {
+                        //Muestro las nor archivadas y un identificador unico por cada lista
                         $listasArchivadas = "form_lista".$count."";
                         /*echo "Cuantas NO archivadas:  ".$listasArchivadas;
                         echo "<br/>";*/
                     }
+                    // Creando tabla, form
                     $tabla = "<td><table border=1>";
                     $varForm = $tabla."<tr><td><form name='".$listasArchivadas."' method='post' action='home.php'>";
                     $varForm1 = "<br/>";
@@ -55,11 +57,11 @@ session_start();
                         $tarea=$row["descripcion"];
                         $varForm4 ="<br/>";
                         $varForm5 = "<tr><td><textarea rows='12' cols='40'>$tarea</textarea>";
-
                     }
                     $varForm6 = "</form>";
                     $varForm7 = "<br/></td></tr></table></td>";
                     
+                    //Dependiendo de si son archivadas o no voy guardando todo lo anterior en una array diferente
                     if ($archivadas == 1){
                          $formTotalArchivadas[$count]= $varForm.$varForm1.$varForm2.$varForm4.$varForm5.$varForm6.$varForm7;
                          //print_r($formTotalArchivadas[$count]);
@@ -84,7 +86,6 @@ session_start();
           <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
           <script src="//code.jquery.com/jquery-1.10.2.js"></script>
           <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-          <link rel="stylesheet" href="/resources/demos/style.css">
             <style>
               #draggable { width: 90%; height: 300px; padding: 0.5em; }
             </style>
@@ -92,10 +93,12 @@ session_start();
         <script src="../js/controlador.js"></script>
         <script type="text/javascript">
         $(document).ready(function(){
+            //Oculto lo que no quiero ver de primeras
             $('#divListasArchivadas').hide();
             $('.ocultarArchivados').hide();
             $(".input_titulo").hide();
             
+            //El pequeño menu para mostrar y quitar los archivados
 		    $(".mostrarArchivados").on( "click", function() {
 		    	$('#divListasArchivadas').show("slow"); //muestro mediante clase
 		    	$('.mostrarArchivados').hide();
@@ -106,11 +109,15 @@ session_start();
 		    	$('.mostrarArchivados').show("slow");
 		    	$('.ocultarArchivados').hide();
 		     });
-		     
+		    
+		   //Esto hace posible mover las listas
+		   //La idea es poder moverlas por separado, pero no lo consigo
 	       $(function() {
             $( "#draggable" ).draggable();
           });
-
+          
+          //Intento hacer posible que al pulsar en el titulo de la lista aparezca el input para poder modificarla
+          //He conseguido identificar que titulo estoy pulsando, pero no consigo hacer aparecer el input...
 		   $(document).on("click", '.label_titulo', function() {
                 var valorId = $(this).attr("id");
                 alert(valorId);
@@ -121,7 +128,7 @@ session_start();
         });
         </script>
     </head>
-    <body align="center"> <!-- alineacion al centro provisional-->
+    <body>
         <div><p>Bienvenido <?php echo $_SESSION['usuario'] ?> <a href='salir.php'> Cerrar sesión <br> </a></p></div>
         <div id="draggable">
             <table border=2>
@@ -160,11 +167,11 @@ session_start();
         			}
         		">
         	</div><div><div class="spoiler" style="display: none;">
-        		<form name="crear_lista" method="post" action="home.php"> 
+        		<form name="crear_lista" method="post" action="pruebas.php"> 
         			<input name="gestion" hidden="true" type="text"  value="crear_lista"/> <br>
         			<label> Crear lista: </label>
         			<input name="titulo_lista" type="text" placeholder="Titulo de la lista"/>
-        			<input type="submit" name="titulo_lista" value="Crear" onclick="crear_lista()">
+        			<input type="submit" name="crear" value="Crear" onclick="crear_lista()">
         		</form>
         	</div></div>
         	</fieldset>
