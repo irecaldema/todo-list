@@ -6,9 +6,9 @@ session_start();
     } else {
         header("location:login.php");
     }
-    echo "Usuario: ".$_SESSION['usuario']."</br>";
-    echo " nombre:  ".$_SESSION['nombre']."</br>";
-    echo " id_usuario: ".$_SESSION['id_usuario']."</br>";
+    echo "Usuario: ".$_SESSION['usuario']."<br/>";
+    echo " nombre:  ".$_SESSION['nombre']."<br/>";
+    echo " id_usuario: ".$_SESSION['id_usuario']."<br/>";
     
     //Busqueda de las listas del usuario
         
@@ -16,7 +16,7 @@ session_start();
         $sql="SELECT * FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'";
         
         //echo $sql;
-        echo "</br>";
+        echo "<br/>";
         $count = false;
         $count = 1; 
         foreach ($conn->query($sql) as $row) {
@@ -32,37 +32,39 @@ session_start();
                     if ($archivadas == 1){
                         //Muestro tambien las listas archivadas
                         $listasArchivadas = "form_lista_archivadas".$count."";
-                        echo "Cuantas archivadas:   ".$listasArchivadas;
-                        echo "</br>";
+                        /*echo "Cuantas archivadas:   ".$listasArchivadas;
+                        echo "<br/>";*/
                     }else {
                         $listasArchivadas = "form_lista".$count."";
-                        echo "Cuantas NO archivadas:  ".$listasArchivadas;
-                        echo "</br>";
+                        /*echo "Cuantas NO archivadas:  ".$listasArchivadas;
+                        echo "<br/>";*/
                     }
                     $tabla = "<td><table border=1>";
                     $varForm = $tabla."<tr><td><form name='".$listasArchivadas."' method='post' action='home.php'>";
-                    $varForm1 = "</br>";
+                    $varForm1 = "<br/>";
                     //echo "titulo ".$titulo_lista;
                     
-                    $varForm2 = "<input name='titulo_lista' type='text' value='".$titulo_lista."' />";
-        			//echo "<input type='submit' name='modificar' id='submit' value='Modificar titulo'>";
-        			$varForm3  =" <button onclick='alert('You are clicking on me');'>Modificar titulo</button></td></tr>";
+                    $varForm2 = "
+                    <div class='label_titulo' id='$count'>$titulo_lista.$count</div>
+                    <input class='input_titulo' id='$count' type='text' value='".$titulo_lista."' />";
                     
                     //Busqueda de las tareas de la lista
+                    //print($id_lista);
                     $sql="SELECT descripcion FROM tareas WHERE id_lista='".$id_lista."'";
                     foreach ($conn->query($sql) as $row) {
                         $tarea=$row["descripcion"];
-                        $varForm4 ="</br>";
+                        $varForm4 ="<br/>";
                         $varForm5 = "<tr><td><textarea rows='12' cols='40'>$tarea</textarea>";
+
                     }
                     $varForm6 = "</form>";
-                    $varForm7 = "</br></td></tr></table></td>";
+                    $varForm7 = "<br/></td></tr></table></td>";
                     
                     if ($archivadas == 1){
-                         $formTotalArchivadas[$count]= $varForm.$varForm1.$varForm2.$varForm3.$varForm4.$varForm5.$varForm6.$varForm7;
+                         $formTotalArchivadas[$count]= $varForm.$varForm1.$varForm2.$varForm4.$varForm5.$varForm6.$varForm7;
                          //print_r($formTotalArchivadas[$count]);
                     }else {
-                         $formTotal[$count]= $varForm.$varForm1.$varForm2.$varForm3.$varForm4.$varForm5.$varForm6.$varForm7;
+                         $formTotal[$count]= $varForm.$varForm1.$varForm2.$varForm4.$varForm5.$varForm6.$varForm7;
                          //var_dump($formTotal[1]);
                     }
                     $count++;
@@ -76,14 +78,23 @@ session_start();
 <html>
     <head>
         <title></title>
-        <style type="text/css">@import "../css/login.css";</style>
+        <style type="text/css">@import "../css/home.css";</style>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <script src="../jquery/jquery-1.11.3.min.js" type="text/javascript"></script>
+        <!--<script src="../jquery/jquery-1.11.3.min.js" type="text/javascript"></script>-->
+          <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+          <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+          <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+          <link rel="stylesheet" href="/resources/demos/style.css">
+            <style>
+              #draggable { width: 90%; height: 300px; padding: 0.5em; }
+            </style>
+                
         <script src="../js/controlador.js"></script>
         <script type="text/javascript">
         $(document).ready(function(){
             $('#divListasArchivadas').hide();
             $('.ocultarArchivados').hide();
+            $(".input_titulo").hide();
             
 		    $(".mostrarArchivados").on( "click", function() {
 		    	$('#divListasArchivadas').show("slow"); //muestro mediante clase
@@ -95,28 +106,46 @@ session_start();
 		    	$('.mostrarArchivados').show("slow");
 		    	$('.ocultarArchivados').hide();
 		     });
+		     
+	       $(function() {
+            $( "#draggable" ).draggable();
+          });
+
+		   $(document).on("click", '.label_titulo', function() {
+                var valorId = $(this).attr("id");
+                alert(valorId);
+                $("div#"+valorId).hide();
+                $("input#"+valorId).show();
+                //$(this).fadeOut(); 
+            });
         });
         </script>
     </head>
-    <body>
+    <body align="center"> <!-- alineacion al centro provisional-->
         <div><p>Bienvenido <?php echo $_SESSION['usuario'] ?> <a href='salir.php'> Cerrar sesión <br> </a></p></div>
-        <table border=2>
-            <tr>
-                <div id="divListas">
-                     <?php for ($i = 0; $i <= $count; $i++) { ;?>
-                        <div><?php print_r( $formTotal[$i]); ?></div>
-                    <?php };?>
-                </div>
-            </tr>
-        </table>
+        <div id="draggable">
+            <table border=2>
+                <tr>
+                    <div id="divListas">
+                         <?php for ($i = 0; $i <= $count; $i++) { ;?>
+                            <div><?php print_r( $formTotal[$i]); ?></div>
+                        <?php };?>
+                    </div>
+                </tr>
+            </table>
+        </div>
         <br/>
-        <div class="mostrarArchivados">Listas Archivadas <img src="../img/iconos/chevron-down.png" height="20px" width="20px" id="ico_mostrar" /> </div>
+        
+        <!-- apenas se ve el texto-->
+        
+        <div class="mostrarArchivados">Listas Archivadas <img src="../img/iconos/chevron-down.png" height="20px" width="20px" id="ico_mostrar" /> </div> 
         <div class="ocultarArchivados">Listas Archivadas <img src="../img/iconos/chevron-up.png" height="20px" width="20px" id="ico_ocultar"/> </div>
         <div id="divListasArchivadas">
              <?php for ($i = 1; $i <= $count; $i++) { ;?>
                 <div><?php echo $formTotalArchivadas[$i]; ?></div>
             <?php };?>
         </div>
+        <br/>
         	<!--boton crear lista-->
         	<fieldset>
         		<legend> Añadir lista </legend>
@@ -165,17 +194,5 @@ session_start();
         	</fieldset>
         	<!--boton cerrado-->
         
-        <table>
-            <tr>
-                <td>lista</td>
-                <td>titulo</td>
-            </tr>
-            <!--for(select * from listas numero de resultados){ -->
-            <tr>
-                <td>listaid</td>
-                <td>titulo</td>
-            </tr>
-            <!--}-->
-        </table>
     </body>
 </html>
