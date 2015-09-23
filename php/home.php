@@ -30,12 +30,13 @@ session_start();
                     
                     if ($archivadas == 1){
                         //creacion de contador de listas
-                        $tituloFormulario = $count."form_lista_archivadas";
+                        $tituloFormulario = "form_lista_archivadas".$count;
                     } else {
-                        $tituloFormulario = "form_lista".$count."";
+                        $tituloFormulario = "form_lista".$count;
                     }
                     //creacion de un formulario por lista
                     $aperturaForm = "<form name='".$tituloFormulario."' method='post' action='home.php'>";
+                    $aperturaForm.="<input name='id_lista' hidden='true' type='text'  value='$id_lista'/>";
                     
         //BORRAR ID LISTA ANTES DE FINALIZAR
                     // cada lista sera una celda de la tabla de listas
@@ -43,14 +44,16 @@ session_start();
                     "<table border=1><tr><td><b>".$id_lista." Titulo:  </b><input class='input_titulo' id='$count' type='text' value='".$titulo_lista."' />";
                     //Busqueda de las tareas de la lista
                     
-                    $sql="SELECT tarea FROM tareas WHERE id_lista='".$id_lista."'";
+                    $sql="SELECT * FROM tareas WHERE id_lista='".$id_lista."'";
                     //vaciado de tareas
                     $task="";
                     foreach ($conn->query($sql) as $row) {
                         $tarea=$row["tarea"];
+                        $id_tarea=$row["id_tarea"];
                         //tarea anterior mas tarea
-                        $comodin = "<tr><td><textarea rows='2' cols='40'>$tarea</textarea></td></tr>";
+                        $comodin = "<tr><td><input name='tarea' type='text' rows='2' cols='40' value='$tarea'/></td></tr>";
                         $task.= $comodin;
+                        $task.="<input name='id_tarea' hidden='true' type='text'  value='$id_tarea'/>";
                     }
                     
                     //foreach busqueda de usuarios relacionados con la lista
@@ -68,13 +71,23 @@ session_start();
                     } 
                     $listusers.="</tr></td>";
                     
+                    $botonera="<tr><td align='right'>";
+                    $botonera.="<input type='submit' name='archivar' onclick='archivar($id_lista)' value='ARCHIVAR'/>";
+                    $botonera.="<input type='submit' name='compartir' onclick='compartir()' value='COMPARTIR'/>";
+                    $botonera.="<input type='submit' name='anadir_tarea' value='AÑADIR TAREA (beta)'/>";
+                    $botonera.="<input type='submit' name='modificar' value='MODIFICAR'/>";
+                    $botonera.="<input id='clienteVisita-input' type='hidden' estoes='cliente' value='' />";
+                    $botonera.="<ul class='autocomplete' estoes='cliente' tipoCliente='clienteVisita' valorDivLoading='clienteVisita' data-id='cliente'  data-role='listview' data-inset='true' data-filter='true' 
+								placeholder='Escribe cliente / Ecrire client'></ul>";
+                    $botonera.="</td></tr>";
+                    
                     $cierre = "</table></form>";
                         
                     //Dependiendo de si son archivadas o no concatenacion de las partes del formulario en una array
                     if ($archivadas == 1){
-                        $formTotalArchivadas[$count]= $aperturaForm.$titulo.$task.$listusers.$cierre;
+                        $formTotalArchivadas[$count]= $aperturaForm.$titulo.$task.$listusers.$botonera.$cierre;
                     }else {
-                        $formTotal[$count]= $aperturaForm.$titulo.$task.$listusers.$cierre;
+                        $formTotal[$count]= $aperturaForm.$titulo.$task.$listusers.$botonera.$cierre;
                     }
                     $count++;
                 }//foreach titulos de las listas
@@ -82,8 +95,7 @@ session_start();
         
         //CREACION DE LISTAS 0.2
          
-        //$formulario=$_POST[""]; //pendiente añadir un input en el formulario
-        $formulario="crear_lista";
+        $formulario=$_POST["gestion"];
         if ($formulario == 'crear_lista') {
             $nombre_lista = $_POST["titulo_lista"];
             $tarea = $_POST["tarea"];
@@ -91,7 +103,7 @@ session_start();
             
             if ($nombre_lista == '') {
                 echo "Vacio, se te redirccionará. Espere.";
-                //header('location:home.php'); //pendiente de REVISAAAR
+                header('location:home.php');
                 //header("Refresh: 3; URL=home.php");
             } else {
                 //echo $nombre_lista;
@@ -100,7 +112,6 @@ session_start();
                 $lastid= $conn -> lastInsertId();
                 
                 //echo $lastid;
-
                 $id_usu = $_SESSION['id_usuario'];
                 
                 $sqlUsuLista = "INSERT INTO usuario_lista VALUES ($id_usu, $lastid, 0)";
@@ -110,12 +121,36 @@ session_start();
                 $sqlTareas = "INSERT INTO tareas (id_lista, tarea, terminado) VALUES ($lastid, '$tarea', 0)";
                 $conn->exec($sqlTareas);
                 
-               // echo $affected_rows.' Introducido correctamente';
-               // header("Refresh: 3; URL=home.php");
+                // echo $affected_rows.' Introducido correctamente';
+                // header("Refresh: 3; URL=home.php");
                 sleep(2);
                 header('location:home.php');
             }
-       }
+        } if ($formulario == 'modificar') {
+            /*$sqla="UPDATE listas SET titulo='$titulo_lista' WHERE id_lista='$id_lista'";
+            $sqla="UPDATE tareas SET tarea='$tarea' WHERE id_tarea='$id_tarea'";*/
+        }
+        
+        //ARCHIVAR LISTAS
+        if ($_POST['archivar']){
+            $id_lista=$_POST['id_lista'];
+            $tarea=$_POST['id_tarea'];
+            $id_usu=$_SESSION['id_usuario'];
+            $sql="SELECT archivado FROM usuario_lista WHERE id_usuario=$id_usu and id_lista=$id_lista";
+            foreach ($conn->query($sql) as $row) {
+                $archivado=$row["archivado"];
+            }    
+            if($archivado){
+                $sqlTareas = "UPDATE usuario_lista SET archivado=0 WHERE id_usuario=$id_usu and id_lista=$id_lista";
+                $conn->exec($sqlTareas);
+            }else{
+                $sqlTareas = "UPDATE usuario_lista SET archivado=1 WHERE id_usuario=$id_usu and id_lista=$id_lista";
+                $conn->exec($sqlTareas);
+            }
+            header('location:home.php');
+        }
+
+       
 ?>
 <!DOCTYPE html>
 <html>
@@ -133,6 +168,8 @@ session_start();
             //Oculto lo que no quiero ver de primeras
             $('#divListasArchivadas').hide();
             $('.ocultarArchivados').hide();
+            $('#divCrearLista').hide();
+            $('.ocultarCrearLista').hide();
            // $(".input_titulo").hide();
             
             //El pequeño menu para mostrar y quitar los archivados
@@ -146,7 +183,29 @@ session_start();
 		    	$('.mostrarArchivados').show("slow");
 		    	$('.ocultarArchivados').hide();
 		     });
-		    
+     	    $(".mostrarCrearLista").on( "click", function() {
+		    	$('#divCrearLista').show("slow"); //muestro mediante clase
+		    	$('.mostrarCrearLista').hide();
+		    	$('.ocultarCrearLista').show("slow");
+		     });
+ 		     $(".ocultarCrearLista").on( "click", function() {
+		    	$('#divCrearLista').hide(); //muestro mediante clase
+		    	$('.mostrarCrearLista').show("slow");
+		    	$('.ocultarCrearLista').hide();
+		     });
+		     
+		     // ****************************** AUTOCOMPLEMENT **************************** 
+            $(document).on( "click", ".autocomplete li", function() {      
+            	var selectedItem = $(this).html();
+            	$(this).parent().parent().find('input').val(selectedItem);   
+            	$('.autocomplete').hide();   
+            	//Si attributo clienteVisita existe tengo q enseñar el contacto de este cliente
+            	if($(this).attr('clienteVisita')){
+            		//	alert( "Valor de id cliente: "+$(this).val() );
+            		muestrarSelect("controladorVistas.php" , 'contactosVisitaListar', $(this).val(), 'contactoVisita') ; 
+            	}
+            });
+	    
 		   //Esto hace posible mover las listas
 		   //La idea es poder moverlas por separado, pero no lo consigo
           
@@ -167,36 +226,24 @@ session_start();
         <div>
     	<!--boton crear lista-->
         	<fieldset>
-        		<legend> Añadir lista </legend>
-        	<div class="divspoiler">
-        		<input type="button" value="Añadir lista" onclick="
-        			if (this.parentNode.nextSibling.childNodes[0].style.display != '') { 
-        				this.parentNode.nextSibling.childNodes[0].style.display = ''; 
-        				this.value = 'Ocultar añadir lista'; 
-        			} else { 
-        				this.parentNode.nextSibling.childNodes[0].style.display = 'none'; 
-        				this.value = 'Añadir lista'; 
-        			}
-        		">
-        	</div><div><div class="spoiler" style="display: none;">
-        		<form name="crear_lista" method="post" action="home.php"> 
-        			<input name="gestion" hidden="true" type="text"  value="crear_lista"/> <br>
-        			<label> Crear lista: </label>
-        			<input name="titulo_lista" type="text" placeholder="Titulo de la lista"/> <br>
-        			Tarea: <br>
-        			<textarea name='tarea' rows='2' cols='40'>  </textarea> <br>
-        			<input type="submit" name="crear" value="Crear" onclick="crear_lista()">
-        		</form>
-        	</div></div>
+        	<legend> Añadir lista </legend>
+    	        <!-- ACCESO A LAS LISTAS ARCHIVADAS -->
+                <div class="mostrarCrearLista">Mostrar<img src="../img/iconos/chevron-down.png" height="20px" width="20px" id="ico_mostrar" /> </div> 
+                <div class="ocultarCrearLista">Ocultar<img src="../img/iconos/chevron-up.png" height="20px" width="20px" id="ico_ocultar"/> </div>
+            <div id="divCrearLista">
+                <div align=center>
+        		    <form name="crear_lista" method="post" action="home.php"> 
+            			<input name="gestion" hidden="true" type="text"  value="crear_lista"/> <br/>
+            			<label> Crear lista: </label>
+            			<input name="titulo_lista" type="text" placeholder="Titulo de la lista"/> <br />
+            			<!--<textarea name='tarea' rows='2' cols='40' placeholder="Tarea"></textarea>-->
+            			<input type="text" name="tarea" placeholder="Añadir tarea">
+            			<input type="submit" name="crear" value="Crear">
+        		    </form>
+            	</div>
+            </div>
         	</fieldset>
-            <!-- LISTAS NO ARCHIVADAS - Hago bucle para mostrarlas -->
-            <!--<div id="divListas">-->
-                <!--<table border=1><!-- tabla para mostrar las listas en varias columnas-->
-                <!--<?php //for ($i = 0; $i <= $count; $i++) { ;?>
-                    <div><td><?php //echo( $formTotal[$i]); ?></td></div>
-                    <?php //};?>
-                -->
-            <!--// PENDIENTE DE REVISAR LAS COLUMNAS-->
+            <!-- LISTAS NO ARCHIVADAS -->
             <!-- tabla para mostrar las listas en varias columnas-->
             <div id="divListas">
                 <fieldset>
@@ -222,16 +269,29 @@ session_start();
         </div>
         <br/>
     
-        <!-- LISTAS ARCHIVADAS - Hago bucle para mostrarlas -->
+        <!-- LISTAS ARCHIVADAS -->
             <fieldset>
             	<legend> Listas archivadas</legend>
-            	<!-- ACCESO A LAS LISTAS ARCHIVADAS -->
-                <div class="mostrarArchivados">Mostrar <img src="../img/iconos/chevron-down.png" height="20px" width="20px" id="ico_mostrar" /> </div> 
-                <div class="ocultarArchivados">No mostrar <img src="../img/iconos/chevron-up.png" height="20px" width="20px" id="ico_ocultar"/> </div>
+            	    <!-- ACCESO A LAS LISTAS ARCHIVADAS -->
+                    <div class="mostrarArchivados">Mostrar<img src="../img/iconos/chevron-down.png" height="20px" width="20px" id="ico_mostrar" /> </div> 
+                    <div class="ocultarArchivados">Ocultar<img src="../img/iconos/chevron-up.png" height="20px" width="20px" id="ico_ocultar"/> </div>
                 <div id="divListasArchivadas">
-                     <?php for ($i = 0; $i <= $count; $i++) { ;?>
-                        <div><?php echo $formTotalArchivadas[$i]; ?></div>
-                    <?php };?>
+                    <table align="center"><tr>
+                     <?php 
+                        $comodin=0;
+                        for ($i = 0; $i <= $count; $i++) { 
+                            if($formTotalArchivadas[$i]==null){
+                            }else{
+                                if($comodin%2==0){
+                                    echo "<tr><td>".$formTotalArchivadas[$i]."</td>";
+                                }else{
+                                    echo "<td>".$formTotalArchivadas[$i]."</td></tr>";
+                                }
+                                $comodin++;
+                            }
+                        }    
+                     ?>
+                    </tr></table>
                 </div>
             </fieldset>
         <br/>
