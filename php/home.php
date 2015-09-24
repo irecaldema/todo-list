@@ -35,14 +35,16 @@ session_start();
                         $tituloFormulario = "form_lista".$count;
                     }
                     //creacion de un formulario por lista
-                    $aperturaForm = "<form name='".$tituloFormulario."' method='post' action='home.php'>";
-                    $aperturaForm.="<input name='id_lista' hidden='true' type='text'  value=$id_lista />";
+                    $aperturaForm = "<table border=1><tr><td>";
+                    $aperturaForm .= "<form name='".$tituloFormulario."' method='post' action='home.php'>";
+                    $aperturaForm .= "<input name='id_lista' hidden='true' type='text'  value=$id_lista />";
                     
         //BORRAR ID LISTA ANTES DE FINALIZAR
                     // cada lista sera una celda de la tabla de listas
-                    $titulo = 
-                    "<table border=1><tr><td><b>".$id_lista." Titulo:  </b><input name='titulo' class='input_titulo' id=$count type='text' value='".$titulo_lista."' />";
+                    $titulo = "<b>".$id_lista." Titulo:  </b>";
+                    $titulo .= "<input name='titulo' class='input_titulo' id=$count type='text' value=$titulo_lista />";
                     //Busqueda de las tareas de la lista
+                    $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                     
                     $sql="SELECT * FROM tareas WHERE id_lista='".$id_lista."'";
                     //vaciado de tareas
@@ -53,14 +55,16 @@ session_start();
                         $id_tarea=$row["id_tarea"];
                         //tarea anterior mas tarea
                         $comodin = "<tr><td>";
-                        $comodin .= "<input name='tarea' type='text' rows='2' cols='40' value='$tarea'/>";
+                        $numtareas="tarea".$contareas;
+                        $comodin .= "<input name=$numtareas type='text' rows='2' cols='40' value='$tarea'/>";
+                        $comodin .= "<input name='numTareas' hidden='true' type='text' value='".$contareas."'/>";
                         $comodin .= "<input type='submit' name='borrar_tarea' value='X'/>";
                         $comodin .= "</td></tr>";
                         
                         $task .= $comodin;
-                        $name='tarea'.$contareas;
-                        $task .= "<input name='id_tarea' hidden='true' type='text'  value='$id_tarea'/>";
-                        //$task .= "<input name=$name hidden='true' type='text'  value='$id_tarea'/>";
+                        $name='id_tarea'.$contareas;
+                        //$task .= "<input name='id_tarea' hidden='true' type='text'  value='$id_tarea'/>";
+                        $task .= "<input name=$name hidden='true' type='text'  value='$id_tarea'/>";
                         $contareas++;
                     }
                     
@@ -84,12 +88,13 @@ session_start();
                     $botonera.="<input type='submit' name='compartir' onclick='compartir()' value='COMPARTIR'/>";
                     $botonera.="<input type='submit' name='anadir_tarea' value='AÑADIR TAREA'/>";
                     $botonera.="<input type='submit' name='modificar' value='MODIFICAR'/>";
-                    $botonera.="<input id='clienteVisita-input' type='hidden' estoes='cliente' value='' />";
-                    $botonera.="<ul class='autocomplete' estoes='cliente' tipoCliente='clienteVisita' valorDivLoading='clienteVisita' data-id='cliente'  data-role='listview' data-inset='true' data-filter='true' 
-								placeholder='Escribe cliente / Ecrire client'></ul>";
+                    $botonera.="<div class='autocomplete'>
+                                    <input type='text' id='usuario' onkeyup='autocomplet()'>
+                                    <ul id='MostrarUsuario'></ul>
+                                </div>";
                     $botonera.="</td></tr>";
                     
-                    $cierre = "</table></form>";
+                    $cierre = "</form></table>";
                         
                     //Dependiendo de si son archivadas o no concatenacion de las partes del formulario en una array
                     if ($archivadas == 1){
@@ -126,23 +131,22 @@ session_start();
                 $sqlUsuLista = "INSERT INTO usuario_lista VALUES ($id_usu, $lastid, 0)";
                 $conn->exec($sqlUsuLista);
                 
-                // TAREAS+ç
+                // TAREAS
                 //num tareas
                 $numTareas = $_POST["numTareas"];
                 for($i=1; $i<($numTareas+1); $i++){
                     //variable con nombre concatenado
                     $tarea = $_POST["tarea".$i];
-                    
-                    echo "tarea: ".$tarea."<br />";
+                    //echo "tarea: ".$tarea."<br />";
                     $sqlTareas = "INSERT INTO tareas (id_lista, tarea, terminado) VALUES ($lastid, '$tarea', 0)";
-                    echo $sqlTareas."<br /><br />";
+                    //echo $sqlTareas."<br /><br />";
                     $conn->exec($sqlTareas);
                 }
                 
                 // echo $affected_rows.' Introducido correctamente';
                 // header("Refresh: 3; URL=home.php");
                 //sleep(2);
-                //header('location:home.php');
+                header('location:home.php');
             }
         } 
         
@@ -151,7 +155,7 @@ session_start();
         if ($_POST['modificar']){
             $pidlista = $_POST["id_lista"];
             $ptitulo = $_POST["titulo"];
-            $ptarea = $_POST["tarea"];
+            //$ptarea = $_POST["tarea"];
             $pidtarea = $_POST["id_tarea"];
             
             //select numero de rows tareas
@@ -162,17 +166,33 @@ session_start();
             }*/
             
             
-            echo "ID Lista: " . $pidlista . "<br> Tituto: " . $ptitulo . "<br> ID Tarea: " . $pidtarea . "<br> Tarea: " . $ptarea;
+            $numTareas = $_POST["numTareas"];
+            $numIdTarea = $_POST["id_tarea"];
+            
+            echo "fuera";
+            for($i=1; $i<($numTareas+1); $i++){
+                
+                //echo "entro";
+                //variable con nombre concatenado
+                $tarea = $_POST["tarea".$i];
+                //echo $tarea;
+                $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$pidtarea";
+                echo "<br>" . $sqlUpdateTareas;
+                /*$q = $conn->prepare($sqlUpdateTareas);
+                $q->execute(array($ptarea,$pidtarea));*/
+            }
+            
+           // echo "ID Lista: " . $pidlista . "<br> Tituto: " . $ptitulo . "<br> ID Tarea: " . $pidtarea . "<br> Tarea: " . $ptarea;
         //UPDATE LISTAS
-            $sqlUpdateListas="UPDATE listas SET titulo='$ptitulo' WHERE id_lista=$pidlista";
-            echo "<br>" . $sqlUpdateListas;
+           /* $sqlUpdateListas="UPDATE listas SET titulo='$ptitulo' WHERE id_lista=$pidlista";
+           // echo "<br>" . $sqlUpdateListas;
             $q = $conn->prepare($sqlUpdateListas);
-            $q->execute(array($ptitulo,$pidlista));
+            $q->execute(array($ptitulo,$pidlista));*/
         //UPDATE TAREAS
-            $sqlUpdateTareas="UPDATE tareas SET tarea='$ptarea' WHERE id_tarea=$pidtarea";
+          /*  $sqlUpdateTareas="UPDATE tareas SET tarea='$ptarea' WHERE id_tarea=$pidtarea";
             echo "<br>" . $sqlUpdateTareas;
             $q = $conn->prepare($sqlUpdateTareas);
-            $q->execute(array($ptarea,$pidtarea));
+            $q->execute(array($ptarea,$pidtarea));*/
         }
         
         //ARCHIVAR LISTAS
@@ -239,7 +259,42 @@ session_start();
             }
                 
         }
-
+        
+        //BORRAR LISTAS
+        if ($_POST["borrar_lista"]){
+            $id_lista=$_POST["id_lista"];
+            $id_usu=$_SESSION['id_usuario'];
+            $sql="SELECT * FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu";
+            $numUsuarios = $conn->prepare($sql);
+            $numUsuarios->execute();
+            $numUsuarios = $numUsuarios->rowCount();
+            
+            //solo un usuario se borra la lista y se relacion
+            if($numUsuarios==1){ 
+                $sql = "DELETE FROM listas WHERE id_lista=$id_lista ";
+                $conn->exec($sql);
+                $sql = "DELETE FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu";
+                $conn->exec($sql);
+            } else {
+                //se borra la relacion de 1 usuario con la lista
+                $sql = "DELETE FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu ";
+                $conn->exec($sql);
+            }
+                
+            //contasor de la tarea borrada si son 0 se borro 
+            $sql="SELECT * FROM usuario_lista WHERE id_usuario=$id_usu and id_lista=$id_lista";
+            $numlistas = $conn->prepare($sql);
+            $numlistas->execute();
+            $numlistas = $numlistas->rowCount();
+            
+            echo "<br/> codigo comprobar estado ".$sql;
+            echo "<br/>".$numlistas;
+            if($numlistas!=0){
+                echo "errrrorrr";
+            }else{
+                header('location:home.php');
+            }
+        }
        
 ?>
 <!DOCTYPE html>
@@ -305,11 +360,45 @@ session_start();
             $(function() {
                 var count=2;
                 $("#anadirTarea").click( function(){
-                    $("#masTareas").append("<input type='text' name='tarea"+count+"' placeholder='Añadir tarea' /><br/>");
+                    $("#masTareas").append("Tarea: <input type='text' name='tarea"+count+"' placeholder='Añadir tarea' /><br/>");
                     $("#masTareas").append("<input name='numTareas' hidden='true' type='text' value='"+count+"'/>");
                 count++;
                 }
                 );
+            });
+            
+            $(document).on("click",'.autocomplete', function (e, data) { 
+            	var $ul = $(this);                        // $ul refers to the shell unordered list under the input 
+            	var value = $( data.input ).val();        // this is value of what user entered in input box
+            	var dropdownContent = "" ; 
+                alert(value);
+        	    $ul.html("") ;                 
+        	 	$.ajax({            
+        			type: "POST",
+        			url: "autocomplet.php",
+        			data: ({
+        				value: value
+        			}),
+        			cache: false,
+        			dataType: "text",
+        			beforeSend: function () {
+        			},
+        			success: onSuccess
+        		});
+        			function onSuccess(data) {
+        			var response =data;
+        			var splits = response.split(','); 
+        			$($ul).show();           
+        				$ul.html( "<li><div><span></span></div></li>" );
+        				$ul.listview( "refresh" );
+        				$.each(splits, function( index, val ) {
+        					//dropdownContent += "<li>" + val + "</li>";
+        					dropdownContent += val ;
+        				$ul.html( dropdownContent );
+        				$ul.listview( "refresh" );
+        				$ul.trigger( "updatelayout"); 
+        			});
+        		}
             });
         });
         </script>
@@ -327,11 +416,11 @@ session_start();
                 <div align=center>
         		    <form name="crear_lista" method="post" action="home.php"> 
             			<input name="gestion" hidden="true" type="text"  value="crear_lista"/> <br/>
-            			<label> Crear lista: </label>
+            			<label> Título: </label>
             			<input name="titulo_lista" type="text" placeholder="Titulo de la lista"/>
             			<input type="button" name="anadir" value="+" id='anadirTarea' /><br />
             			<!--<textarea name='tarea' rows='2' cols='40' placeholder="Tarea"></textarea>-->
-            			<input type="text" name="tarea1" placeholder="Añadir tarea">
+            			Tarea: <input type="text" name="tarea1" placeholder="Añadir tarea">
             			<div id='masTareas'></div>
             			<br />
             			<input type="submit" name="crear" value="Crear" />
@@ -347,15 +436,20 @@ session_start();
                     <table align="center"><tr>
                      <?php 
                         $comodin=0;
-                        for ($i = 0; $i <= $count; $i++) { 
+                        for ($i = 1; $i <= ($count+1); $i++) { 
                             if($formTotal[$i]==null){
                             }else{
-                                if($comodin%2==0){
+                                if($comodin==0){
                                     echo "<tr><td>".$formTotal[$i]."</td>";
+                                    //echo "<td>$comodin".$formTotal[$i]."</td></tr>";
+                                    $comodin++;
+                                }else if ($comodin==1){
+                                    echo "<td>".$formTotal[$i]."</td>";
+                                    $comodin++;
                                 }else{
                                     echo "<td>".$formTotal[$i]."</td></tr>";
+                                    $comodin=0;
                                 }
-                                $comodin++;
                             }
                         }    
                      ?>
