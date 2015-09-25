@@ -42,7 +42,7 @@ session_start();
         //BORRAR ID LISTA ANTES DE FINALIZAR
                     // cada lista sera una celda de la tabla de listas
                     $titulo = "<b>".$id_lista." Titulo:  </b>";
-                    $titulo .= "<input name='titulo' class='input_titulo' id=$count type='text' value=$titulo_lista />";
+                    $titulo .= "<input name='titulo' class='input_titulo' id=$count type='text' value='".$titulo_lista."' />";
                     //Busqueda de las tareas de la lista
                     $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                     
@@ -170,74 +170,36 @@ session_start();
         } 
         
         //MODIFICAR ID LISTA
-
         if ($_POST['modificar']){
             $pidlista = $_POST["id_lista"];
             $ptitulo = $_POST["titulo"];
             $a_ids = $_POST["a_ids"];
             $a_tareas = $_POST["a_tareas"];
-            
-            //ejemplo recorrer array
-            /*foreach ( $a_ids as $id ) { 
-                echo $id; 
-            }*/
-
             $numTareas = $_POST["numTareas"];
-                // valor
-
-                //echo "aa: " . $valorIdTarea;
-                
-            print_r($a_ids);
-            print_r($a_tareas);
-            for ($i=0; $i<$numTareas; $i++) {
-                echo "<br>ss: " .$a_ids[$i]." ".$a_tareas[$i];
-                
-                //updates
-             }
-                    //$tarea = $_POST["tarea".$i];
-                    //echo $tarea;
-                    //$sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$idTareaS";
-                    //echo "<br>" . $sqlUpdateTareas;
-                
-            
-                //echo "asd: " . $aa;
-                //break;
-
-            /*for($i=1; $i<($numTareas+1); $i++) {
-                //variable con nombre concatenado
-                
-                // contenido después de modificar
-                $tarea = $_POST["tarea".$i];
-                // contenido antes de haber sido modificado
-                $tarea2 = $_POST["tareas".$i];
-
-                // sacar id_tarea mediante id_lista y el nombre de la tarea (antes de ser modificado)
-                $sqla="SELECT id_tarea FROM tareas WHERE tarea='$tarea2' and id_lista=$pidlista";
-                
-                foreach ($conn->query($sqla) as $row) {
-                    $idTareaS=$row["id_tarea"];
-
-                //UPDATE TAREAS
-                    $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$idTareaS";
-                    //echo "<br>" . $sqlUpdateTareas;
-                    $q = $conn->prepare($sqlUpdateTareas);
-                    $q->execute(array($tarea,$idTareaS));
-                }
-                header('location:home.php');
-            }
-            
-           // echo "ID Lista: " . $pidlista . "<br> Tituto: " . $ptitulo . "<br> ID Tarea: " . $pidtarea . "<br> Tarea: " . $ptarea;
+ 
         //UPDATE LISTAS
             $sqlUpdateListas="UPDATE listas SET titulo='$ptitulo' WHERE id_lista=$pidlista";
-           // echo "<br>" . $sqlUpdateListas;
             $q = $conn->prepare($sqlUpdateListas);
-            $q->execute(array($ptitulo,$pidlista));*/
-        //UPDATE TAREAS
-          /*  $sqlUpdateTareas="UPDATE tareas SET tarea='$ptarea' WHERE id_tarea=$pidtarea";
-            echo "<br>" . $sqlUpdateTareas;
-            $q = $conn->prepare($sqlUpdateTareas);
-            $q->execute(array($ptarea,$pidtarea));*/
-        }
+            $q->execute(array($ptitulo,$pidlista));
+            //echo "<br/> update de titulo $sqlUpdateListas <br/>";
+            //print_r($a_ids);
+            //print_r($a_tareas);
+            
+            for ($i=0; $i<$numTareas; $i++) {
+                //echo "<br>ss: " .$a_ids[$i]." ".$a_tareas[$i];
+                
+                $id_tarea=$a_ids[$i];
+                $tarea=$a_tareas[$i];
+                
+                $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$id_tarea";
+                $q = $conn->prepare($sqlUpdateTareas);
+                $q->execute(array($a_tareas[$i],$a_ids[$i]));
+                //echo "<br/> update tareas: $i $sqlUpdateTareas";
+                
+            }
+             
+            header('location:home.php');
+        }    
         
         //ARCHIVAR LISTAS
         if ($_POST["archivar"]){
@@ -330,6 +292,7 @@ session_start();
             $id_lista=$_POST["id_lista"];
             $id_usu=$_SESSION['id_usuario'];
             $sql="SELECT * FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu";
+            
             $numUsuarios = $conn->prepare($sql);
             $numUsuarios->execute();
             $numUsuarios = $numUsuarios->rowCount();
@@ -373,12 +336,6 @@ session_start();
           <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
            
         <script src="../js/controlador.js"></script>
-        
-        <!--<script type="text/javascript">
-            //alertas de saludo y despedida
-            //function saludo() {alert('Bienvenido a la página de Javascript')}
-            //function despedida() {alert('Gracias por tu visita')}
-        </script>-->
         
         <script type="text/javascript">
         $(document).ready(function(){
