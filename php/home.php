@@ -14,7 +14,7 @@ session_start();
         
         //Busqueda de las listas del usuario
         //$sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=".$archivadas;
-        $sql="SELECT * FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'";
+        $sql="SELECT * FROM usuario_lista WHERE id_usuario=".$_SESSION['id_usuario'];
         
         echo "<br/>";
         $count = 0; 
@@ -24,7 +24,7 @@ session_start();
             //echo $archivadas;
             
             //Busqueda de todos los titulos segun los id listas obtenidos anteriormente
-                $sql="SELECT titulo FROM listas WHERE id_lista='".$id_lista."'";
+                $sql="SELECT titulo FROM listas WHERE id_lista=$id_lista";
                 foreach ($conn->query($sql) as $row) {
                     $titulo_lista=$row["titulo"];
                     
@@ -46,27 +46,58 @@ session_start();
                     //Busqueda de las tareas de la lista
                     $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                     
-                    $sql="SELECT * FROM tareas WHERE id_lista='".$id_lista."'";
+                    $sql="SELECT * FROM tareas WHERE id_lista=$id_lista";
+                    
+                //row count
+                    $contareas = $conn->prepare($sql);
+                    $contareas->execute();
+                    $contareas = $contareas->rowCount();
+                //en construccion
+                //echo $id_lista." numero de tareas ".$contareas." ".$sql."<br/>";
+                    //$contareas=2;
+                    //$a_ids = array($contareas);
                     //vaciado de tareas
                     $task="";
-                    $contareas=1;
+                    //$contareas=1;
                     foreach ($conn->query($sql) as $row) {
                         $tarea=$row["tarea"];
                         $id_tarea=$row["id_tarea"];
+                    //prueba array IosuR
+                        //array_push($a_ids, $id_tarea);
                         //tarea anterior mas tarea
                         $comodin = "<tr><td>";
-                        $numtareas="tarea".$contareas;
-                        $comodin .= "<input name=$numtareas type='text' rows='2' cols='40' value='$tarea'/>";
-                        $comodin .= "<input name='numTareas' hidden='true' type='text' value='".$contareas."'/>";
+                        //$numtareas="tarea".$contareas; //tarea1
+                        //$numtareas2="tareas".$contareas;
+                        //$comodin .= "<input name=$numtareas type='text' rows='2' cols='40' value='$tarea'/>";
+                    //PRUEBA ID
+                        $sql="SELECT terminado FROM tareas WHERE id_lista=$id_lista and id_tarea=$id_tarea";
+                        foreach ($conn->query($sql) as $row) {
+                            $tachado=$row["terminado"];
+                        }
+                        if ($tachado){
+                            $comodin .= "<input name='tachado[]' type='checkbox' rows='2' cols='40' value=$tachado checked />";
+                        }else{
+                            $comodin .= "<input name='tachado[]' type='checkbox' rows='2' cols='40' value=$tachado />";
+                        }
+                        
+                        $comodin .= "<input name=$id_tarea type='text' rows='2' cols='40' value='$tarea'/>";
+                        // prueba ruben
+                        $comodin .= "<input name='a_ids[]' type='text' hidden='true' value=$id_tarea />";
+                        // para recoger el valor antes de ser modificado
+                        //$comodin .= "<input name=$numtareas2 type='text' hidden='true' rows='2' cols='40' value='$tarea'/>";
+                        //$comodin .= "<input name='numTareas' hidden='true' type='text' value='".$contareas."'/>";
                         $comodin .= "<input type='submit' name='borrar_tarea' value='X'/>";
                         $comodin .= "</td></tr>";
                         
                         $task .= $comodin;
-                        $name='id_tarea'.$contareas;
+                        //$name='id_tarea'.$contareas;
                         //$task .= "<input name='id_tarea' hidden='true' type='text'  value='$id_tarea'/>";
-                        $task .= "<input name=$name hidden='true' type='text'  value='$id_tarea'/>";
-                        $contareas++;
+                        //$task .= "<input name=$name hidden='true' type='text'  value='$id_tarea'/>";
+                        //$contareas++;
                     }
+                    //se añade input de numero de tareas
+                    $task .= "<input name='numTareas' hidden='true' type='text' value=$contareas />";
+                    //$task .= "<input name='a_ids' type='text' hidden='true' value=$a_ids />";
                     
                     //foreach busqueda de usuarios relacionados con la lista
                     $listusers="<tr><td>Usuarios: ";
@@ -88,10 +119,6 @@ session_start();
                     $botonera.="<input type='submit' name='compartir' onclick='compartir()' value='COMPARTIR'/>";
                     $botonera.="<input type='submit' name='anadir_tarea' value='AÑADIR TAREA'/>";
                     $botonera.="<input type='submit' name='modificar' value='MODIFICAR'/>";
-                    $botonera.="<div class='autocomplete'>
-                                    <input type='text' id='usuario' onkeyup='autocomplet()'>
-                                    <ul id='MostrarUsuario'></ul>
-                                </div>";
                     $botonera.="</td></tr>";
                     
                     $cierre = "</form></table>";
@@ -130,7 +157,6 @@ session_start();
                 
                 $sqlUsuLista = "INSERT INTO usuario_lista VALUES ($id_usu, $lastid, 0)";
                 $conn->exec($sqlUsuLista);
-                
                 // TAREAS
                 //num tareas
                 $numTareas = $_POST["numTareas"];
@@ -142,7 +168,6 @@ session_start();
                     //echo $sqlTareas."<br /><br />";
                     $conn->exec($sqlTareas);
                 }
-                
                 // echo $affected_rows.' Introducido correctamente';
                 // header("Refresh: 3; URL=home.php");
                 //sleep(2);
@@ -155,8 +180,25 @@ session_start();
         if ($_POST['modificar']){
             $pidlista = $_POST["id_lista"];
             $ptitulo = $_POST["titulo"];
+            $a_ids = $_POST["a_ids"];
+            
+            //ejemplo recorrer array
+            /*foreach ( $a_ids as $id ) { 
+                echo $id; 
+            }*/
+            /* //ejemplo 2
+            if ( !empty($_GET["como"]) && is_array($_GET["como"]) ) { 
+                echo "<ul>";
+                foreach ( $_GET["como"] as $como ) { 
+                        echo "<li>";
+                        echo $como; 
+                        echo "</li>"; 
+                 }
+                 echo "</ul>";
+            }*/
+            
             //$ptarea = $_POST["tarea"];
-            $pidtarea = $_POST["id_tarea"];
+            //$pidtarea = $_POST["id_tarea"];
             
             //select numero de rows tareas
             /*$numtareas = $conn->exec("SELECT * FROM tareas WHERE id_lista=$id_lista");
@@ -165,26 +207,63 @@ session_start();
                 ${"pidtarea".$i} = $_POST["id_tarea"];
             }*/
             
-            
+            //número de la tarea
             $numTareas = $_POST["numTareas"];
-            $numIdTarea = $_POST["id_tarea"];
             
-            echo "fuera";
-            for($i=1; $i<($numTareas+1); $i++){
+            for ($i=1; $i<200; $i++) {
+                // valor
+                $valorIdTarea = $_POST[$i];
                 
-                //echo "entro";
+                $valorPrueba = $_POST['a_ids'];
+
+                //echo "aa: " . $valorIdTarea;
+
+                if ($valorIdTarea == '') {
+                    echo "";
+                } else {
+                    echo "<br>aa: " . $valorIdTarea;
+
+                    foreach ($valorPrueba as $como) {
+                        echo "<br>ss: " . $como;
+                     }
+
+                    //echo "<br>ss: " . $valorPrueba;
+                    //$tarea = $_POST["tarea".$i];
+                    //echo $tarea;
+                    //$sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$idTareaS";
+                    //echo "<br>" . $sqlUpdateTareas;
+                }
+            
+                //echo "asd: " . $aa;
+                //break;
+            }
+
+            /*for($i=1; $i<($numTareas+1); $i++) {
                 //variable con nombre concatenado
+                
+                // contenido después de modificar
                 $tarea = $_POST["tarea".$i];
-                //echo $tarea;
-                $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$pidtarea";
-                echo "<br>" . $sqlUpdateTareas;
-                /*$q = $conn->prepare($sqlUpdateTareas);
-                $q->execute(array($ptarea,$pidtarea));*/
+                // contenido antes de haber sido modificado
+                $tarea2 = $_POST["tareas".$i];
+
+                // sacar id_tarea mediante id_lista y el nombre de la tarea (antes de ser modificado)
+                $sqla="SELECT id_tarea FROM tareas WHERE tarea='$tarea2' and id_lista=$pidlista";
+                
+                foreach ($conn->query($sqla) as $row) {
+                    $idTareaS=$row["id_tarea"];
+
+                //UPDATE TAREAS
+                    $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$idTareaS";
+                    //echo "<br>" . $sqlUpdateTareas;
+                    $q = $conn->prepare($sqlUpdateTareas);
+                    $q->execute(array($tarea,$idTareaS));
+                }
+                header('location:home.php');
             }
             
            // echo "ID Lista: " . $pidlista . "<br> Tituto: " . $ptitulo . "<br> ID Tarea: " . $pidtarea . "<br> Tarea: " . $ptarea;
         //UPDATE LISTAS
-           /* $sqlUpdateListas="UPDATE listas SET titulo='$ptitulo' WHERE id_lista=$pidlista";
+            $sqlUpdateListas="UPDATE listas SET titulo='$ptitulo' WHERE id_lista=$pidlista";
            // echo "<br>" . $sqlUpdateListas;
             $q = $conn->prepare($sqlUpdateListas);
             $q->execute(array($ptitulo,$pidlista));*/
@@ -246,9 +325,8 @@ session_start();
             }*/
             
             //en busca de solucion proque id tarea solo recoge el ultimo id tarea de la lista :(
-            $sql = "DELETE FROM tareas WHERE id_tarea=$id_tarea ";
+            $sql = "DELETE FROM tareas WHERE id_tarea=$id_tarea";
             $conn->exec($sql);
-                
             //contasor de la tarea borrada si son 0 se borro 
             $numtareas2 = $conn->exec("SELECT * FROM tareas WHERE id_tarea=$id_tarea and id_lista=$id_lista");
             if($numtareas2){
@@ -257,6 +335,28 @@ session_start();
                 //no encontro la tarea se borro bien
                 header('location:home.php');
             }
+            
+            
+            /*try {
+                //$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+                
+                $count=$conn->prepare("DELETE FROM tareas WHERE id_tarea=:id_tarea");
+                $count->bindParam(":id_tarea",$id_tarea,PDO::PARAM_INT);
+                $count->execute();
+                //$result = $count->fetchAll(PDO::FETCH_ASSOC);
+                
+                $value = $count->fetchColumn(1);
+                
+                var_dump($value);
+                
+                //$count->closeCursor();
+    
+                //$conn->commit();
+
+            } catch(PDOException $e) {
+                echo $e->getMessage();
+            }*/
                 
         }
         
@@ -306,8 +406,15 @@ session_start();
           <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
           <script src="//code.jquery.com/jquery-1.10.2.js"></script>
           <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-                
+           
         <script src="../js/controlador.js"></script>
+        
+        <!--<script type="text/javascript">
+            //alertas de saludo y despedida
+            //function saludo() {alert('Bienvenido a la página de Javascript')}
+            //function despedida() {alert('Gracias por tu visita')}
+        </script>-->
+        
         <script type="text/javascript">
         $(document).ready(function(){
             //Oculto lo que no quiero ver de primeras
@@ -339,17 +446,6 @@ session_start();
 		    	$('.ocultarCrearLista').hide();
 		     });
 		     
-		     // ****************************** AUTOCOMPLEMENT **************************** 
-            $(document).on( "click", ".autocomplete li", function() {      
-            	var selectedItem = $(this).html();
-            	$(this).parent().parent().find('input').val(selectedItem);   
-            	$('.autocomplete').hide();   
-            	//Si attributo clienteVisita existe tengo q enseñar el contacto de este cliente
-            	if($(this).attr('clienteVisita')){
-            		//	alert( "Valor de id cliente: "+$(this).val() );
-            		muestrarSelect("controladorVistas.php" , 'contactosVisitaListar', $(this).val(), 'contactoVisita') ; 
-            	}
-            });
 		   $(document).on("click", '.label_titulo', function() {
                 var valorId = $(this).attr("id");
                 alert(valorId);
@@ -365,40 +461,6 @@ session_start();
                 count++;
                 }
                 );
-            });
-            
-            $(document).on("click",'.autocomplete', function (e, data) { 
-            	var $ul = $(this);                        // $ul refers to the shell unordered list under the input 
-            	var value = $( data.input ).val();        // this is value of what user entered in input box
-            	var dropdownContent = "" ; 
-                alert(value);
-        	    $ul.html("") ;                 
-        	 	$.ajax({            
-        			type: "POST",
-        			url: "autocomplet.php",
-        			data: ({
-        				value: value
-        			}),
-        			cache: false,
-        			dataType: "text",
-        			beforeSend: function () {
-        			},
-        			success: onSuccess
-        		});
-        			function onSuccess(data) {
-        			var response =data;
-        			var splits = response.split(','); 
-        			$($ul).show();           
-        				$ul.html( "<li><div><span></span></div></li>" );
-        				$ul.listview( "refresh" );
-        				$.each(splits, function( index, val ) {
-        					//dropdownContent += "<li>" + val + "</li>";
-        					dropdownContent += val ;
-        				$ul.html( dropdownContent );
-        				$ul.listview( "refresh" );
-        				$ul.trigger( "updatelayout"); 
-        			});
-        		}
             });
         });
         </script>
@@ -485,30 +547,5 @@ session_start();
                 </div>
             </fieldset>
         <br/>
-        	
-        	<!--boton modificar lista-->
-        	<fieldset>
-        		<legend> Modificar lista </legend>
-        	<div class="divspoiler">
-        		<input type="button" value="Modificar lista" onclick="
-        			if (this.parentNode.nextSibling.childNodes[0].style.display != '') { 
-        				this.parentNode.nextSibling.childNodes[0].style.display = ''; 
-        				this.value = 'Ocultar añadir lista'; 
-        			} else { 
-        				this.parentNode.nextSibling.childNodes[0].style.display = 'none'; 
-        				this.value = 'Modificar lista'; 
-        			}
-        		">
-        	</div><div><div class="spoiler" style="display: none;">
-        		<form name="modificar_lista" method="post" action="home.php"> 
-        			<input name="gestion" hidden="true" type="text"  value="modificar_lista"/> <br>
-        			<label> Modificar lista: </label>
-        			<input name="titulo_lista" type="text" placeholder="Titulo de la lista"/>
-        			<input type="submit" id="submit" value="Modificar">
-        		</form>
-        	</div></div>
-        	</fieldset>
-        	<!--boton cerrado-->
-        
     </body>
 </html>
