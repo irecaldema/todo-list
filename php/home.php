@@ -80,20 +80,14 @@ session_start();
                             $comodin .= "<input name='tachado[]' type='checkbox' rows='2' cols='40' value=$tachado />";
                         }
                         
-                        $comodin .= "<input name=$id_tarea type='text' rows='2' cols='40' value='$tarea'/>";
-                        // prueba ruben
+                        $comodin .= "<input name='a_tareas[]' type='text' rows='2' cols='40' value='$tarea'/>";
                         $comodin .= "<input name='a_ids[]' type='text' hidden='true' value=$id_tarea />";
-                        // para recoger el valor antes de ser modificado
-                        //$comodin .= "<input name=$numtareas2 type='text' hidden='true' rows='2' cols='40' value='$tarea'/>";
-                        //$comodin .= "<input name='numTareas' hidden='true' type='text' value='".$contareas."'/>";
                         $comodin .= "<input type='submit' name='borrar_tarea' value='X'/>";
                         $comodin .= "</td></tr>";
                         
                         $task .= $comodin;
-                        //$name='id_tarea'.$contareas;
-                        //$task .= "<input name='id_tarea' hidden='true' type='text'  value='$id_tarea'/>";
-                        //$task .= "<input name=$name hidden='true' type='text'  value='$id_tarea'/>";
-                        //$contareas++;
+
+
                     }
                     //se añade input de numero de tareas
                     $task .= "<input name='numTareas' hidden='true' type='text' value=$contareas />";
@@ -181,62 +175,33 @@ session_start();
             $pidlista = $_POST["id_lista"];
             $ptitulo = $_POST["titulo"];
             $a_ids = $_POST["a_ids"];
+            $a_tareas = $_POST["a_tareas"];
             
             //ejemplo recorrer array
             /*foreach ( $a_ids as $id ) { 
                 echo $id; 
             }*/
-            /* //ejemplo 2
-            if ( !empty($_GET["como"]) && is_array($_GET["como"]) ) { 
-                echo "<ul>";
-                foreach ( $_GET["como"] as $como ) { 
-                        echo "<li>";
-                        echo $como; 
-                        echo "</li>"; 
-                 }
-                 echo "</ul>";
-            }*/
-            
-            //$ptarea = $_POST["tarea"];
-            //$pidtarea = $_POST["id_tarea"];
-            
-            //select numero de rows tareas
-            /*$numtareas = $conn->exec("SELECT * FROM tareas WHERE id_lista=$id_lista");
-            for($i=1; $i<$numtareas; $i++){
-                //variable con nombre concatenado
-                ${"pidtarea".$i} = $_POST["id_tarea"];
-            }*/
-            
-            //número de la tarea
+
             $numTareas = $_POST["numTareas"];
-            
-            for ($i=1; $i<200; $i++) {
                 // valor
-                $valorIdTarea = $_POST[$i];
-                
-                $valorPrueba = $_POST['a_ids'];
 
                 //echo "aa: " . $valorIdTarea;
-
-                if ($valorIdTarea == '') {
-                    echo "";
-                } else {
-                    echo "<br>aa: " . $valorIdTarea;
-
-                    foreach ($valorPrueba as $como) {
-                        echo "<br>ss: " . $como;
-                     }
-
-                    //echo "<br>ss: " . $valorPrueba;
+                
+            print_r($a_ids);
+            print_r($a_tareas);
+            for ($i=0; $i<$numTareas; $i++) {
+                echo "<br>ss: " .$a_ids[$i]." ".$a_tareas[$i];
+                
+                //updates
+             }
                     //$tarea = $_POST["tarea".$i];
                     //echo $tarea;
                     //$sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$idTareaS";
                     //echo "<br>" . $sqlUpdateTareas;
-                }
+                
             
                 //echo "asd: " . $aa;
                 //break;
-            }
 
             /*for($i=1; $i<($numTareas+1); $i++) {
                 //variable con nombre concatenado
