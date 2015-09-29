@@ -5,8 +5,7 @@
     
     //Busqueda de las listas del usuario
     //$sql="SELECT id_lista FROM usuario_lista WHERE id_usuario='".$_SESSION['id_usuario']."'and archivado=".$archivadas;
-    $sql=false;
-    $sql="SELECT * FROM usuario_lista WHERE id_usuario=".$_SESSION['id_usuario']." ORDER BY id_lista DESC";
+    $sql="SELECT * FROM usuario_lista WHERE id_usuario=".$_SESSION['id_usuario'];
     
     echo "<br/>";
     $count = 0; 
@@ -16,7 +15,7 @@
         //echo $archivadas;
         
         //Busqueda de todos los titulos segun los id listas obtenidos anteriormente
-            $sql="SELECT titulo FROM listas WHERE id_lista=$id_lista";
+            $sql="SELECT titulo FROM listas WHERE id_lista=$id_lista ";
             foreach ($conn->query($sql) as $row) {
                 $titulo_lista=$row["titulo"];
                 
@@ -38,7 +37,7 @@
                 //Busqueda de las tareas de la lista
                 $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                 
-                $sql="SELECT * FROM tareas WHERE id_lista=$id_lista";
+                $sql="SELECT * FROM tareas WHERE id_lista=$id_lista ORDER BY id_tarea DESC";
                 
             //row count
                 $contareas = $conn->prepare($sql);
@@ -67,14 +66,15 @@
                         $tachado=$row["terminado"];
                     }
                     if ($tachado){
-                        $comodin .= "<input name='tachado[]' type='checkbox' rows='2' cols='40' value=$tachado checked />";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' rows='2' cols='40' value=$id_tarea checked />";
                     }else{
-                        $comodin .= "<input name='tachado[]' type='checkbox' rows='2' cols='40' value=$tachado />";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' rows='2' cols='40' value=$id_tarea />";
                     }
                     
                     $comodin .= "<input name='a_tareas[]' type='text' rows='2' cols='40' value='$tarea'/>";
-                    $comodin .= "<input name='a_ids[]' type='text' hidden='true' value=$id_tarea />";
-                    $comodin .= "<input type='submit' name='borrar_tarea' value='X'/>";
+                    $comodin .= "<input name='a_ids[]' type='text' hidden='true' value='$id_tarea' />";
+                    //$comodin .= "<input type='submit' name='borrar_tarea' value='X' />";
+                    $comodin .= "<button type='submit' name='borrar_tarea' value='$id_tarea'>X</button>";
                     $comodin .= "</td></tr>";
                     
                     $task .= $comodin;
@@ -116,6 +116,14 @@
                 //Dependiendo de si son archivadas o no concatenacion de las partes del formulario en una array
                 if ($archivadas == 1){
                     $formTotalArchivadas[$count]= $aperturaForm.$titulo.$task.$listusers.$botonera.$cierre;
+                    /*
+                        ${formTotalArchivadas.$count}[0]=$aperturaForm;
+                        ${formTotalArchivadas.$count}[1]=$titulo;
+                        ${formTotalArchivadas.$count}[2]=$task;
+                        ${formTotalArchivadas.$count}[3]=$listusers;
+                        ${formTotalArchivadas.$count}[4]=$botonera;
+                        ${formTotalArchivadas.$count}[5]=$cierre;
+                    */
                 }else {
                     $formTotal[$count]= $aperturaForm.$titulo.$task.$listusers.$botonera.$cierre;
                 }
