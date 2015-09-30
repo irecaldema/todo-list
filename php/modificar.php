@@ -1,6 +1,10 @@
 <?php
     include("conexionPDO.php");
     session_start();
+    if (isset($_SESSION['usuario'])){
+    } else {
+        header("location:login.php");
+    }
     //MODIFICAR LISTAS
         
     //UPDATE LISTAS    
@@ -77,19 +81,38 @@
     //AÑADIR TAREAS SIN CONFIRMAR
     if ($_POST['anadir_tarea']){
         $id_lista=$_POST['id_lista'];
-        $tarea=$_POST['id_tarea'];
-        $id_usu=$_SESSION['id_usuario'];
-        $sql="SELECT archivado FROM usuario_lista WHERE id_usuario=$id_usu and id_lista=$id_lista";
-        foreach ($conn->query($sql) as $row) {
-            $archivado=$row["archivado"];
-        }    
-        if($archivado){
-            $sqlTareas = "UPDATE usuario_lista SET archivado=0 WHERE id_usuario=$id_usu and id_lista=$id_lista";
+        try{
+            $sqlTareas = "INSERT INTO tareas (id_lista, tarea, terminado) VALUES ($id_lista, '', 0)";
             $conn->exec($sqlTareas);
-        }else{
-            $sqlTareas = "UPDATE usuario_lista SET archivado=1 WHERE id_usuario=$id_usu and id_lista=$id_lista";
-            $conn->exec($sqlTareas);
+            header('location:home.php');
+        }catch(PDOException $e){
+            echo "Error insertando tarea: ".$sqlDelete . "<br>" . $e->getMessage();
         }
-        header('location:home.php');
+    }
+    
+    //AÑADIR USUARIOS A LISTA
+    if ($_POST['compartir']){
+        $id_lista=$_POST['id_lista'];
+        $receptor=$_POST['receptor'];
+        
+        //echo " id lista $id_lista receptor $receptor <br/>";
+        try{
+
+            //$sql = "SELECT id_usuario FROM usuarios WHERE usuario=".$receptor;
+            $sql = "SELECT id_usuario FROM usuarios WHERE usuario='".$receptor."'";
+            echo "usuario $receptor id usuario $receptor_id <br/>";
+            echo "<br/>".$sql;
+            foreach ($conn->query($sql) as $row) {
+                $receptor_id=$row["id_usuario"];
+            }
+            
+            $sqlTareas = "INSERT INTO usuario_lista (id_usuario, id_lista) VALUES ($receptor_id, $id_lista)";
+            $conn->exec($sqlTareas);
+            echo "lista $id_lista compartida";
+            header('location:home.php');
+        }catch(PDOException $e){
+            echo "Error al compartir: ".$sqlDelete . "<br>" . $e->getMessage();
+            echo "<br/>buena suerte<br/>";
+        }
     }
 ?>        

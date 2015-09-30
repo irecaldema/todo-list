@@ -1,6 +1,10 @@
 <?php
     include("conexionPDO.php");
     session_start();
+    if (isset($_SESSION['usuario'])){
+    } else {
+        header("location:login.php");
+    }
     
     //BORRAR LISTAS
     if ($_POST["borrar_lista"]){
@@ -41,15 +45,14 @@
     //BORRAR TAREAS
     if ($_POST["borrar_tarea"]){
         $id_tarea = $_POST["borrar_tarea"];
-        echo $id_tarea."<br/>";
+        //echo $id_tarea."<br/>";
 
         try {
             $sqlDelete = "DELETE FROM tareas WHERE id_tarea=$id_tarea";
             $conn->exec($sqlDelete);
             //echo "Record deleted successfully";
             header('location:home.php');
-        }
-        catch(PDOException $e){
+        } catch(PDOException $e) {
             echo "Error borrando tarea: ".$sqlDelete . "<br>" . $e->getMessage();
         }
     }

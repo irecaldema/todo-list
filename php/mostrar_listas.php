@@ -1,6 +1,10 @@
 <?php
     include("conexionPDO.php");
     session_start();
+    if (isset($_SESSION['usuario'])){
+    } else {
+        header("location:login.php");
+    }
     //MOSTRAR LISTAS 0.1
     
     //Busqueda de las listas del usuario
@@ -37,7 +41,7 @@
                 //Busqueda de las tareas de la lista
                 $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                 
-                $sql="SELECT * FROM tareas WHERE id_lista=$id_lista ORDER BY id_tarea DESC";
+                $sql="SELECT * FROM tareas WHERE id_lista=$id_lista";
                 
             //row count
                 $contareas = $conn->prepare($sql);
@@ -66,14 +70,13 @@
                         $tachado=$row["terminado"];
                     }
                     if ($tachado){
-                        $comodin .= "<input name='a_tachados[]' type='checkbox' rows='2' cols='40' value=$id_tarea checked />";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea checked />";
                     }else{
-                        $comodin .= "<input name='a_tachados[]' type='checkbox' rows='2' cols='40' value=$id_tarea />";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea />";
                     }
                     
-                    $comodin .= "<input name='a_tareas[]' type='text' rows='2' cols='40' value='$tarea'/>";
+                    $comodin .= "<input name='a_tareas[]' type='text' value='$tarea'/>";
                     $comodin .= "<input name='a_ids[]' type='text' hidden='true' value='$id_tarea' />";
-                    //$comodin .= "<input type='submit' name='borrar_tarea' value='X' />";
                     $comodin .= "<button type='submit' name='borrar_tarea' value='$id_tarea'>X</button>";
                     $comodin .= "</td></tr>";
                     
@@ -101,14 +104,22 @@
                 $listusers.="</tr></td>";
                 
                 $botonera="<tr><td align='right'>";
-                $botonera.="<input type='submit' name='archivar' onclick='archivar($id_lista)' value='ARCHIVAR'/>";
-                $botonera.="<input type='submit' name='compartir' onclick='compartir()' value='COMPARTIR'/>";
+                /*$botonera.="<div class='input_container'>
+                                <input name='receptor' />
+                                <ul id='country_list_id'></ul>
+                            </div>";*/                
+                //$botonera.="<input type='submit' name='archivar' value='ARCHIVAR'/>";
+                $botonera.="<input type='text' name='receptor' placeholder='nombre de usuario'/>";
+                $botonera.="<input type='submit' name='compartir' value='COMPARTIR'/>";
+                $botonera.="</td></tr><tr><td align='right'>";
                 $botonera.="<input type='submit' name='anadir_tarea' value='AÑADIR TAREA'/>";
                 $botonera.="<input type='submit' name='modificar' value='MODIFICAR'/>";
-                $botonera.="<div class='input_container'>
-                                <input type='text' id='country_id' onkeyup='autocomplet()' />
-                                <ul id='country_list_id'></ul>
-                            </div>";
+                if ($archivadas == 1) {
+                    $botonera.="<input type='submit' name='archivar' value='DESARCHIVAR'/>";
+                } else {
+                    $botonera.="<input type='submit' name='archivar' value='ARCHIVAR'/>";
+                }
+
                 $botonera.="</td></tr>";
                 
                 $cierre = "</form></table>";

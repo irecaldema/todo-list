@@ -1,6 +1,10 @@
 <?php
     include("conexionPDO.php");
     session_start();
+    if (isset($_SESSION['usuario'])){
+    } else {
+        header("location:login.php");
+    }
     //CREACION DE LISTAS 0.2
         
         //$formulario=$_POST["gestion"];
