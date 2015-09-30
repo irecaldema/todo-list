@@ -71,11 +71,11 @@
                     }
                     if ($tachado){
                         $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea checked />";
+                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' disabled/>";
                     }else{
                         $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea />";
+                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea'/>";
                     }
-                    
-                    $comodin .= "<input name='a_tareas[]' type='text' value='$tarea'/>";
                     $comodin .= "<input name='a_ids[]' type='text' hidden='true' value='$id_tarea' />";
                     $comodin .= "<button type='submit' name='borrar_tarea' value='$id_tarea'>X</button>";
                     $comodin .= "</td></tr>";
@@ -141,6 +141,4 @@
                 $count++;
             }//foreach titulos de las listas
     }//foreach listas del usuario conectado
-    
-    //mostrar listas
 ?>        

@@ -109,7 +109,8 @@
             $sqlTareas = "INSERT INTO usuario_lista (id_usuario, id_lista) VALUES ($receptor_id, $id_lista)";
             $conn->exec($sqlTareas);
             echo "lista $id_lista compartida";
-            header('location:home.php');
+            echo "<br/>".$sqlTareas;
+            //header('location:home.php');
         }catch(PDOException $e){
             echo "Error al compartir: ".$sqlDelete . "<br>" . $e->getMessage();
             echo "<br/>buena suerte<br/>";
