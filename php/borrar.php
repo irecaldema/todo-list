@@ -10,12 +10,14 @@
     if ($_POST["borrar_lista"]){
         $id_lista=$_POST["id_lista"];
         $id_usu=$_SESSION['id_usuario'];
-        $sql="SELECT * FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu";
+        //$sql="SELECT * FROM usuario_lista WHERE id_lista=$id_lista and id_usuario=$id_usu"; error!!!
+        $sql="SELECT * FROM usuario_lista WHERE id_lista=$id_lista "; // por revisar
         
         $numUsuarios = $conn->prepare($sql);
         $numUsuarios->execute();
         $numUsuarios = $numUsuarios->rowCount();
         
+
         //solo un usuario se borra la lista y se relacion
         if($numUsuarios==1){ 
             $sql = "DELETE FROM listas WHERE id_lista=$id_lista ";
@@ -42,6 +44,7 @@
             header('location:home.php');
         }
     }
+    
     //BORRAR TAREAS
     if ($_POST["borrar_tarea"]){
         $id_tarea = $_POST["borrar_tarea"];

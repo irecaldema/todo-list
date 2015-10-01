@@ -90,7 +90,7 @@
         }
     }
     
-    //AÑADIR USUARIOS A LISTA
+    //COMPARTIR USUARIOS A LISTA
     if ($_POST['compartir']){
         $id_lista=$_POST['id_lista'];
         $receptor=$_POST['receptor'];
@@ -110,7 +110,7 @@
             $conn->exec($sqlTareas);
             echo "lista $id_lista compartida";
             echo "<br/>".$sqlTareas;
-            //header('location:home.php');
+            header('location:home.php');
         }catch(PDOException $e){
             echo "Error al compartir: ".$sqlDelete . "<br>" . $e->getMessage();
             echo "<br/>buena suerte<br/>";

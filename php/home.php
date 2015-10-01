@@ -19,7 +19,8 @@
 <html>
     <head>
         <title></title>
-        <style type="text/css">@import "../css/home.css";</style>
+        <!--<style type="text/css">@import "../css/home.css";</style>-->
+        <link rel="stylesheet" type="text/css" href="../css/home.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -72,9 +73,9 @@
         		<legend> Listas </legend>
                     <table align="center"><tr>
                      <?php 
-                        $comodin=0;
+                        $comodin=0; //variable para dividir las listas por columnas
                         //for ($i = 1; $i <= ($count+1); $i++) {
-                        for ($i = $count; $i > 0; $i--) {
+                        for ($i = $count; $i >= 0; $i--) {
                             if($formTotal[$i]==null){
                             }else{
                                 if($comodin==0){

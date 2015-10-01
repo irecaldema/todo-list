@@ -37,7 +37,7 @@
     //BORRAR ID LISTA ANTES DE FINALIZAR
                 // cada lista sera una celda de la tabla de listas
                 $titulo = "<b>".$id_lista." Titulo:  </b>";
-                $titulo .= "<input name='titulo' class='input_titulo' id=$count type='text' value='".$titulo_lista."' />";
+                $titulo .= "<input name='titulo' class='input_titulo' id=$count type='text' value='".$titulo_lista."' size='45' />";
                 //Busqueda de las tareas de la lista
                 $titulo .= "<input type='submit' name='borrar_lista' value='X'/>";
                 
@@ -70,13 +70,13 @@
                         $tachado=$row["terminado"];
                     }
                     if ($tachado){
-                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea checked />";
-                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' disabled/>";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea checked size='40' />";
+                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' disabled size='40'/>";
                     }else{
-                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea />";
-                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea'/>";
+                        $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea size='40' />";
+                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' size='40' />";
                     }
-                    $comodin .= "<input name='a_ids[]' type='text' hidden='true' value='$id_tarea' />";
+                    $comodin .= "<input name='a_ids[]' type='text' hidden='true' value='$id_tarea' size='40' />";
                     $comodin .= "<button type='submit' name='borrar_tarea' value='$id_tarea'>X</button>";
                     $comodin .= "</td></tr>";
                     
