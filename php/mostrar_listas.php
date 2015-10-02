@@ -71,7 +71,7 @@
                     }
                     if ($tachado){
                         $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea checked size='40' />";
-                        $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' disabled size='40'/>";
+                        $comodin .= "<input class='tachado' name='a_tareas[]' type='text' value='$tarea' size='40'/>";
                     }else{
                         $comodin .= "<input name='a_tachados[]' type='checkbox' value=$id_tarea size='40' />";
                         $comodin .= "<input name='a_tareas[]' type='text' value='$tarea' size='40' />";

@@ -4,7 +4,6 @@
     } else {
         header("location:login.php");
     }
-    
     include("conexionPDO.php");
     include("mostrar_listas.php");
     include("crear_lista.php");

@@ -7,7 +7,7 @@
     }
     //MODIFICAR LISTAS
         
-    //UPDATE LISTAS    
+    //UPDATE LISTAS    //error cuando hay tareas tachadas
     if ($_POST['modificar']){
         $pidlista = $_POST["id_lista"];
         $ptitulo = $_POST["titulo"];
@@ -41,7 +41,7 @@
             $q->execute(array($a_tareas[$i],$a_ids[$i]));
             //echo "<br/> update para vaciar: $i $sqlUpdateTareas";
             
-            //  SIN CONFIRMAR
+            //
             $sqlUpdateTareas="UPDATE tareas SET tarea='$tarea' WHERE id_tarea=$id_tarea";
             $q = $conn->prepare($sqlUpdateTareas);
             $q->execute(array($a_tareas[$i],$a_ids[$i]));
@@ -78,7 +78,7 @@
         header('location:home.php');
     }
         
-    //AÑADIR TAREAS SIN CONFIRMAR
+    //AÑADIR TAREAS
     if ($_POST['anadir_tarea']){
         $id_lista=$_POST['id_lista'];
         try{
